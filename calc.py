@@ -58,7 +58,7 @@ def atualizar_visor_calculadora(valor):
 
 def limpar_view_model():
     """ Método responsável por limpar a variável view_model que guarda a situação da tela """
-    global view_model
+    global view_model # para evitar shadowing da variável global
     view_model['inteiro'].clear()
     view_model['decimal'].clear()
     view_model['separador'] = False 
@@ -101,6 +101,20 @@ def ao_clicar_positivo_negativo():
         view_model['inteiro'].insert(0, '-')
     atualizar_visor_calculadora(juntar_inteiro_decimal())
 
+def ao_clicar_percentual():
+    global view_model
+    numero = juntar_inteiro_decimal() / 100
+    view_model['inteiro'].clear()
+    view_model['decimal'].clear()
+    num_str_list = str(numero).split(sep='.')
+    view_model['inteiro'] = list(num_str_list[0])
+
+    if num_str_list[1] != 0:
+        view_model['decimal'] = list(num_str_list[1])
+        view_model['separador'] = True
+    
+    atualizar_visor_calculadora(juntar_inteiro_decimal())
+
 while True:  # Event Loop
     (event, values) = window.read()
     print(event, values)
@@ -121,5 +135,7 @@ while True:  # Event Loop
         ao_clicar_igual()
     if event == '-POSNEG-':
         ao_clicar_positivo_negativo()
+    if event == '%':
+        ao_clicar_percentual()
 
 window.close()
