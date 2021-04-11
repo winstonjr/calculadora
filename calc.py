@@ -44,7 +44,7 @@ layout = [
 ]
 
 """ Cria a janela em si usando o layout que foi criado acima """
-window = sg.Window('Calculadora', layout)
+window = sg.Window('Calculadora', layout, return_keyboard_events=True, use_default_focus=False)
 
 view_model = { 'inteiro': [], 'decimal': [], 'separador':False }
 
@@ -56,7 +56,14 @@ def atualizar_visor_calculadora(valor):
     """ método desponsável por atualizar o visor da calculadora """
     window['-VISOR-'].update(value=valor)
 
-def clicou_numero(event):
+def limpar_view_model():
+    """ Método responsável por limpar a variável view_model que guarda a situação da tela """
+    global view_model
+    view_model['inteiro'].clear()
+    view_model['decimal'].clear()
+    view_model['separador'] = False 
+
+def ao_clicar_numero(event):
     """ método responsável por adicionar o numero novo no view_model e atualizar o visor """
     global view_model
     if view_model['separador']:
@@ -65,26 +72,21 @@ def clicou_numero(event):
         view_model['inteiro'].append(event)
     atualizar_visor_calculadora(juntar_inteiro_decimal())
 
-def limpar_view_model():
-    """ Método responsável por limpar a variável view_model que guarda a situação da tela """
-    global view_model
-    view_model['inteiro'].clear()
-    view_model['decimal'].clear()
-    view_model['separador'] = False 
-
 while True:  # Event Loop
-    event, values = window.read()
+    (event, values) = window.read()
     print(event, values)
     # já que não aprendi ainda como evitar o "while True" a condição de saída é a primeira opção do meu loop
     if event == sg.WIN_CLOSED:
         break
     if event in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-        clicou_numero(event)
+        ao_clicar_numero(event)
     if event == '.':
         view_model['separador'] = True
     if event == '-LC-':
         limpar_view_model()
         atualizar_visor_calculadora(0.0)
         view_model['result'] = 0.0
+    # if event in ['+','-','*','/']:
+    #     operator_click(event)
 
 window.close()
