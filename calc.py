@@ -9,7 +9,7 @@ nm = { 'size':(3, 2), 'pad':(0,0), 'button_color':('white', '#888b8f'), 'font':(
 lb = { 'size':(11, 2), 'pad':(0,0), 'button_color':('white', '#888b8f'), 'font':('Helvetica', 12) }
 
 """ Linhas de botões da calculadora com suas devidas formatações """
-linha1 = [sg.Button('AC', key='-AC-', **fb), 
+linha1 = [sg.Button('LC', key='-LC-', **fb), 
           sg.Button('+/-', key='-POSNEG-', **fb), 
           sg.Button('%', key='%', **fb), 
           sg.Button('/', key='/', **op)]
@@ -35,7 +35,7 @@ linha5 = [sg.Button('0', key='0', **lb),
 
 """ Organização das linhas em um layout (formato de exibição ordem dos componentes de forma integrada) """
 layout = [
-     [sg.Text('0', size=(13,1), pad=(0,0), key='-RESULT-', text_color='white', background_color='#414345', font=('Helvetica', 30), justification='right')],
+     [sg.Text('0.0', size=(13,1), pad=(0,0), key='-VISOR-', text_color='white', background_color='#414345', font=('Helvetica', 30), justification='right')],
      linha1,
      linha2,
      linha3,
@@ -46,7 +46,31 @@ layout = [
 """ Cria a janela em si usando o layout que foi criado acima """
 window = sg.Window('Calculadora', layout)
 
-view_model = { '' }
+view_model = { 'inteiro': [], 'decimal': [], 'separador':False }
+
+def juntar_inteiro_decimal():
+    """ faz a junção dos números antes e depois da casa decimal """
+    return float(''.join(view_model['inteiro']) + '.' + ''.join(view_model['decimal']))
+
+def atualizar_visor_calculadora(valor):
+    """ método desponsável por atualizar o visor da calculadora """
+    window['-VISOR-'].update(value=valor)
+
+def clicou_numero(event):
+    """ método responsável por adicionar o numero novo no view_model e atualizar o visor """
+    global view_model
+    if view_model['separador']:
+        view_model['decimal'].append(event)
+    else:
+        view_model['inteiro'].append(event)
+    atualizar_visor_calculadora(juntar_inteiro_decimal())
+
+def limpar_view_model():
+    """ Método responsável por limpar a variável view_model que guarda a situação da tela """
+    global view_model
+    view_model['inteiro'].clear()
+    view_model['decimal'].clear()
+    view_model['separador'] = False 
 
 while True:  # Event Loop
     event, values = window.read()
@@ -54,7 +78,13 @@ while True:  # Event Loop
     # já que não aprendi ainda como evitar o "while True" a condição de saída é a primeira opção do meu loop
     if event == sg.WIN_CLOSED:
         break
-    if event == '-UM-':
-        window['-RESULT-'].update()
+    if event in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        clicou_numero(event)
+    if event == '.':
+        view_model['separador'] = True
+    if event == '-LC-':
+        limpar_view_model()
+        atualizar_visor_calculadora(0.0)
+        view_model['result'] = 0.0
 
 window.close()
