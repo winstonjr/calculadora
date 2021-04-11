@@ -88,15 +88,18 @@ def ao_clicar_igual():
     view_model['numB'] = juntar_inteiro_decimal()
     try:
         view_model['resultado'] = eval(str(view_model['numA']) + view_model['operacao'] + str(view_model['numB']))
-        print(view_model['numA'])
-        print(view_model['operacao'])
-        print(view_model['numB'])
-        print(view_model['resultado'])
         atualizar_visor_calculadora(view_model['resultado'])
         limpar_view_model()    
     except:
         atualizar_visor_calculadora("ERROR! DIV/0")
         limpar_view_model()
+def ao_clicar_positivo_negativo():
+    global view_model
+    if view_model['inteiro'][0] == '-':
+        del view_model['inteiro'][0]
+    else:
+        view_model['inteiro'].insert(0, '-')
+    atualizar_visor_calculadora(juntar_inteiro_decimal())
 
 while True:  # Event Loop
     (event, values) = window.read()
@@ -116,5 +119,7 @@ while True:  # Event Loop
         ao_clicar_operador(event)
     if event == '=':
         ao_clicar_igual()
+    if event == '-POSNEG-':
+        ao_clicar_positivo_negativo()
 
 window.close()
