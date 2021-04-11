@@ -77,10 +77,26 @@ def ao_clicar_operador(event):
     global view_model
     view_model['operacao'] = event
     try:
-        view_model['numA'] = format_number()
+        view_model['numA'] = juntar_inteiro_decimal()
     except:
         view_model['numA'] = view_model['resultado']
     limpar_view_model()
+
+def ao_clicar_igual():
+    """ método responsável por calcular o resultado do calculo feito na calculadora """
+    global view_model
+    view_model['numB'] = juntar_inteiro_decimal()
+    try:
+        view_model['resultado'] = eval(str(view_model['numA']) + view_model['operacao'] + str(view_model['numB']))
+        print(view_model['numA'])
+        print(view_model['operacao'])
+        print(view_model['numB'])
+        print(view_model['resultado'])
+        atualizar_visor_calculadora(view_model['resultado'])
+        limpar_view_model()    
+    except:
+        atualizar_visor_calculadora("ERROR! DIV/0")
+        limpar_view_model()
 
 while True:  # Event Loop
     (event, values) = window.read()
@@ -98,5 +114,7 @@ while True:  # Event Loop
         view_model['result'] = 0.
     if event in ['+','-','*','/']:
         ao_clicar_operador(event)
+    if event == '=':
+        ao_clicar_igual()
 
 window.close()
