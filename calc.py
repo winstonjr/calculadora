@@ -46,7 +46,7 @@ layout = [
 """ Cria a janela em si usando o layout que foi criado acima """
 window = sg.Window('Calculadora', layout, return_keyboard_events=True, use_default_focus=False)
 
-view_model = { 'inteiro': [], 'decimal': [], 'separador':False }
+view_model = { 'inteiro': [], 'decimal': [], 'separador':False, 'operacao':'', 'numA': 0., 'numB': 0., 'resultado': 0. }
 
 def juntar_inteiro_decimal():
     """ faz a junção dos números antes e depois da casa decimal """
@@ -72,6 +72,16 @@ def ao_clicar_numero(event):
         view_model['inteiro'].append(event)
     atualizar_visor_calculadora(juntar_inteiro_decimal())
 
+def ao_clicar_operador(event):
+    """ metódo responsável por cuidar do uso dos simbolos matemáticos permitidos na calculadora """
+    global view_model
+    view_model['operacao'] = event
+    try:
+        view_model['numA'] = format_number()
+    except:
+        view_model['numA'] = view_model['resultado']
+    limpar_view_model()
+
 while True:  # Event Loop
     (event, values) = window.read()
     print(event, values)
@@ -84,9 +94,9 @@ while True:  # Event Loop
         view_model['separador'] = True
     if event == '-LC-':
         limpar_view_model()
-        atualizar_visor_calculadora(0.0)
-        view_model['result'] = 0.0
-    # if event in ['+','-','*','/']:
-    #     operator_click(event)
+        atualizar_visor_calculadora(0.)
+        view_model['result'] = 0.
+    if event in ['+','-','*','/']:
+        ao_clicar_operador(event)
 
 window.close()
